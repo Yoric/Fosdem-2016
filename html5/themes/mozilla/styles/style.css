@@ -795,6 +795,10 @@ span.strikethrough {
   text-decoration: line-through;
 }
 
+td.fixed {
+  text-decoration: line-through;
+}
+
 table.stack {
   font-family:monospace;
   font-size:small;
