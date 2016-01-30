@@ -781,3 +781,106 @@ ul.inline li:last-child::after {
 .list #langMenuDivId {
   display: none;
 }
+
+
+span.emph {
+  font-style: italic;
+}
+
+span.qa {
+  font-weight: bold;
+}
+
+span.strikethrough {
+  text-decoration: line-through;
+}
+
+table.stack {
+  font-family:monospace;
+  font-size:small;
+}
+
+table.stack td {
+  padding-right: .5em;
+  border-bottom: black 1pt solid;
+  background-color: white;
+}
+
+table.stack td.stacknum {
+  font-family:sans-serif;
+  font-weight: bold;
+  text-align: right;
+  padding-right: 2em;
+}
+
+table.buglist {
+  font-size: 70%;
+}
+
+table.buglist td {
+  background-color: darkgreen;
+  border: gray 1pt inset;
+  color: white;
+  padding: .5em;
+}
+
+span.tick {
+  display: inline-block;
+  background-image: url('../../../pictures/yatta.png');
+  background-repeat: no-repeat;
+  background-size: .9em;
+  width: 1em;
+  height: 1em;
+  padding: 0;
+  margin: 0;
+}
+
+p.source {
+  font-family: monospace;
+  font-size: small;
+  background-color: white;
+  padding: 1em;
+}
+
+span.js2-external-variable {
+  color: green;
+}
+
+span.js2-function-call {
+  color: blue;
+}
+
+span.js2-keyword {
+  font-weight: bold;
+}
+
+span.js2-comment {
+  font-style: italic;
+  color: gray;
+}
+
+h2.discussion {
+  font-weight: bold;
+}
+
+div.sandglass {
+  background-image: url('../../../pictures/Sandglass-flat.svg');
+  background-size: .7em;
+  background-repeat: no-repeat;
+  height: 1em;
+  width: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
+  padding: none;
+}
+
+div.stopwatch {
+  background-image: url('../../../pictures/Stopwatch.svg');
+  background-size: .8em;
+  background-repeat: no-repeat;
+  height: 1em;
+  width: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
+  padding: none;
+}

@@ -1,0 +1,846 @@
+<!DOCTYPE HTML>
+<!-- <html lang="en-US"> -->
+<html lang="en-US" class="fade">
+<!-- 
+  ^ a class of "fade" makes slides fade smoothly into one another
+ -->
+<!-- <html lang="en-US" class="nonumbers"> -->
+<!-- 
+  If you want no numbers on the slides add a "nonumbers" class 
+  to the HTML element.
+  Adding a class of "fade" will make slides fade into another. 
+-->
+<head>
+  <meta charset="UTF-8">
+  <title>Performance Monitoring</title>
+<!-- 
+  If you upload your slides to the web, ensure that you have 
+  a good title - this shows up in search results and social
+  media links
+ -->
+  <meta name="viewport" content="width=device-width, user-scalable=yes">
+  <link rel="stylesheet" href="themes/mozilla/styles/style.css">
+</head>
+<body class="list">
+  <header class="caption">
+    <h1>Performance Monitoring</h1>
+    <p class="footer">
+      David Teller, 
+      <a href="http://twitter.com/ImYoric">@ImYoric</a> or 
+      <a href="mailto:dteller@mozila.com">dteller@mozilla.com</a>
+    </p>
+  </header>
+  <aside class="talkdescription">
+    <p>This slide deck is using the shower system - roll over the previews to see the notes and click any slide to go into presentation mode. Then use keys to navigate. <button onclick="goFullScreen()">Go fullscreen</button></p>
+    <p class="abstract">
+      <strong>Abstract: </strong>
+       Firefox has recently gained an API designed to let developers and add-on developers monitor in real-time the performance of add-ons, webpages or Firefox itself. In this talk, I will present this API, and what we did to make it work reliably and without reducing the performance of Firefox.
+    </p>
+  </aside>
+
+<!-- 
+    Simply copy the whole block for each slide you want.
+  Special slides get extra classes. Each slide needs an ID 
+  to allow for bookmarking and target jumping.
+-->
+
+  <div id="cover" class="slide"><div>
+    <section>
+      <header>
+        <h2>Firefox Performance Monitoring</h2>
+      </header>
+      <img src="pictures/Blitzer-icon.svg" 
+           class="middle" height="400"
+           alt="High-five at the Mozilla Festival!">
+      <small class="byline">
+        David, Teller, FOSDEM 2016, Brussels
+      </small>
+    </section>
+  </div></div>
+
+<!-- end slide block -->
+
+<div id="intro" class="slide"><div>
+  <section>
+    <header>
+      <h2>Troubleshooting</h2>
+    </header>
+    <ul class="inner" style="list-decoration:none">
+      <li class="active"><span class="qa">Problem</span> Sometimes, Firefox sucks.</li>
+      <li><span class="qa">Solution</span> Er..., we'll improve Firefox!</li>
+    </ul>
+  </section>
+</div></div>
+
+<div id="intro2" class="slide"><div>
+  <section>
+    <header>
+      <h2>Troubleshooting</h2>
+    </header>
+    <ul class="inner">
+      <li class="active"><span class="qa">Problem</span> Sometimes, <span class="emph">my</span> Firefox sucks.</li>
+      <li><span class="qa">Solution</span> Oh, then it's probably an add-on!<div style="margin-top:2em"/></li>
+      <li><span class="qa">Problem</span> Er... which one?</li>
+    </ul>
+  </section>
+</div></div>
+
+<div id="intro:objective" class="slide"><div>
+  <section>
+    <header>
+      <h2>How do we fix this?</h2>
+    </header>
+    <ol>
+      <li>What is running?</li>
+      <li>How slow is it?</li>
+      <li>Report it!</li>
+    </ol>
+  </section>
+</div></div>
+
+  <div id="section:what" class="slide oneline"><div>
+    <section>
+      <header>
+        <h2>So what's running?</h2>
+      </header>
+    </section>
+  </div></div>
+
+  <div id="section:what:stack:bare" class="slide"><div>
+    <section>
+      <header>
+        <h2>The JS Stack</h2>
+      </header>
+
+      <table class="stack">
+        <tbody>
+          <tr>
+            <td class="stacknum">
+              1
+            </td>
+            <td>
+              resource://gre/modules/Browser.jsm
+            </td>
+            <td>
+              tabbrowser.prototype.openTab()
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+              2
+            </td>
+            <td>
+              http://innocent.looking.blog.com/index.html
+            </td>
+            <td>
+              letsPutAFacebookButton()
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+              3
+            </td>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+            <td>
+              weShouldTrackThisUser()
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+              4
+            </td>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+            <td>
+              letsLoadMegaresources()
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+              5
+            </td>
+            <td>
+              chrome://adblockplus/resources/blocker.js
+            </td>
+            <td>
+              isThisSpam()
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+              6
+            </td>
+            <td>
+              chrome://adblockplus/resources/blocker.js
+            </td>
+            <td>
+              wellWhatDoYouThink()
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+              7
+            </td>
+            <td>
+              C++ code
+            </td>
+            <td>
+              whoKnowsWhatHappensHere(Lchar[];1)
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+              8
+            </td>
+            <td>
+              chrome://ghostery/resources/metoo.js
+            </td>
+            <td>
+              heyGuysIKnowIKnow()
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+            </td>
+            <td>
+            ...
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+              15
+            </td>
+            <td>
+              chrome://adblockplus/resources/blocker.js
+            </td>
+            <td>
+              ahRightNowIKnowWhatToDoWithIt()
+            </td>
+          </tr>
+          <tr>
+            <td class="stacknum">
+            </td>
+            <td>
+            ...
+            </td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div></div>
+
+  <div id="section:what:stack:compartments" class="slide"><div>
+    <section>
+      <header>
+        <h2>The JS Stack: Compartments</h2>
+      </header>
+      <table class="stack">
+        <tbody>
+          <tr>
+            <td>
+              resource://gre/modules/Browser.jsm
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://innocent.looking.blog.com/index.html
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+          </tr>
+          <tr>
+            <td>
+              chrome://adblockplus/resources/blocker.js
+            </td>
+          </tr>
+          <tr>
+            <td>
+              chrome://adblockplus/resources/blocker.js
+            </td>
+          </tr>
+          <tr>
+            <td>
+              C++ code
+            </td>
+          </tr>
+          <tr>
+            <td>
+              chrome://ghostery/resources/metoo.js
+            </td>
+          </tr>
+          <tr>
+            <td>
+            ...
+            </td>
+          </tr>
+          <tr>
+            <td>
+              chrome://adblockplus/resources/blocker.js
+            </td>
+          </tr>
+          <tr>
+            <td>
+            ...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div></div>
+
+  <div id="section:what:stack:addons" class="slide"><div>
+    <section>
+      <header>
+        <h2>The JS Stack: Owners</h2>
+      </header>
+
+      <table class="stack">
+        <tbody>
+          <tr>
+            <td>
+              Firefox built-in code
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://innocent.looking.blog.com/index.html
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+          </tr>
+          <tr>
+            <td>
+              ...
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Ghostery
+            </td>
+          </tr>
+          <tr>
+            <td>
+            ...
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+          </tr>
+          <tr>
+            <td>
+            ...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </section>
+  </div></div>
+
+  <div id="section:what:outro" class="slide"><div>
+    <section>
+      <header>
+        <h2>The story so far</h2>
+      </header>
+      <ol>
+        <li>What is running? <span class="tick"></span></li>
+        <li>How slow is it?</li>
+        <li>Report it!</li>
+      </ol>
+    </section>
+  </div></div>
+
+  <div id="section:how" class="slide oneline"><div>
+    <section>
+      <header>
+        <h2>So, how slow is it?</h2>
+      </header>
+    </section>
+  </div></div>
+
+  <div id="section:how:clock" class="slide"><div>
+    <section>
+      <header>
+        <h2>Measuring with a clock</h2>
+      </header>
+
+      <table class="stack">
+        <tbody>
+          <tr>
+            <td>
+              Firefox built-in code
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://innocent.looking.blog.com/index.html
+            </td>
+            <td>
+              <div class="sandglass"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+            <td>
+              <div class="sandglass"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+            <td>
+              <div class="sandglass"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              ...
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Ghostery
+            </td>
+            <td>
+              <div class="sandglass"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+            ...
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+            ...
+            </td>
+            <td>
+              ...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div></div>
+
+  <div id="section:how:clock:discussion" class="slide"><div>
+    <section>
+      <header>
+        <h2>Measuring with a clock</h2>
+      </header>
+
+      <h2 class="discussion">
+      Pros
+      </h2>
+      <ul>
+      <li>Simple to implement.</li>
+      <li>Real-time data.</li>
+      </ul>
+
+      <h2 class="discussion">
+      Cons
+      </h2>
+      <ul>
+        <li>Clocks are slow.</li>
+        <li>Clocks... stop and jump and time travel?</li>
+      </ul>
+    </section>
+  </div></div>
+
+  <div id="section:how:profiler" class="slide"><div>
+    <section>
+      <header>
+        <h2>Measuring with a profiler</h2>
+      </header>
+      <p class="source"><span class="js2-external-variable"><span class="region"><span class="js2-function-call">setInterval</span></span></span><span class="region">(() =&gt; {<br>
+      &nbsp;&nbsp;<span class="js2-keyword">while</span> (true) {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="js2-keyword">for</span> (<span class="js2-keyword">let</span> frame <span class="js2-keyword">of</span> </span><span class="js2-external-variable"><span class="region"><span class="js2-function-call">getStack</span></span></span><span class="region">()) {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="js2-external-variable"><span class="region">stats</span></span><span class="region">[frame.id] += 1 <span class="js2-comment">/* ms */</span>;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+      &nbsp;&nbsp;}<br>
+      }, 1 <span class="js2-comment">/* ms */</span>);</span></p>
+
+      + postprocessing
+    </section>
+  </div></div>
+
+  <div id="section:how:profiler:discussion" class="slide"><div>
+    <section>
+      <header>
+        <h2>Measuring with a profiler</h2>
+      </header>
+
+      <h2 class="discussion">
+      Pros
+      </h2>
+      <ul>
+      <li>Predictable/bounded CPU cost.</li>
+      <li>It works!</li>
+      </ul>
+
+      <h2 class="discussion">
+      Cons
+      </h2>
+      <ul>
+        <li>Interesting thread-safety issues.</li>
+        <li>Post-processing.</li>
+        <li>Unpredictable Battery costs.</li>
+      </ul>
+    </section>
+  </div></div>
+
+  <div id="section:how:rdtsc" class="slide"><div>
+    <section>
+      <header>
+        <h2>Measuring with RDTSC</h2>
+      </header>
+
+      ReaD Time Stamp Clock: return the number of clock cycles elapsed on <span class="emph">this</span> core
+      since the last reset.
+
+      <br />
+
+      Fun fact: It's not monotonic. At all.
+    </section>
+  </div></div>
+
+  <div id="section:how:rdtsc:stack" class="slide"><div>
+    <section>
+      <header>
+        <h2>Measuring with RDTSC</h2>
+      </header>
+
+      <table class="stack">
+        <tbody>
+          <tr>
+            <td>
+              Firefox built-in code
+            </td>
+            <td>
+              <div class="sandglass"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://innocent.looking.blog.com/index.html
+            </td>
+            <td>
+              <div class="stopwatch"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+            <td>
+              <div class="stopwatch"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              http://scripts.facebook.com/spam.js
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+            <td>
+              <div class="stopwatch"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              ...
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Ghostery
+            </td>
+            <td>
+              <div class="stopwatch"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+            ...
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              AdBlock Plus
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+            ...
+            </td>
+            <td>
+              ...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      + postprocessing
+    </section>
+  </div></div>
+
+  <div id="section:how:rdtsc:discussion" class="slide"><div>
+    <section>
+      <header>
+        <h2>Measuring with RDTSC</h2>
+      </header>
+
+      <h2 class="discussion">
+      Pros
+      </h2>
+      <ul>
+      <li>No observable CPU cost.</li>
+      <li>No observable Battery cost.</li>
+      <li>Bounded errors.</li>
+      </ul>
+
+      <h2 class="discussion">
+      Cons
+      </h2>
+      <ul>
+        <li>Results are only reliable on average.</li>
+      </ul>
+    </section>
+  </div></div>
+
+  <div id="section:how:outro" class="slide"><div>
+    <section>
+      <header>
+        <h2>The story so far</h2>
+      </header>
+      <ol>
+        <li>What is running? <span class="tick"></span></li>
+        <li>How slow is it? <span class="tick"></span></li>
+        <li>Report it!</li>
+      </ol>
+    </section>
+  </div></div>
+
+  <div id="section:result:but" class="slide"><div>
+    <section>
+      <header>
+        <h2>But...</h2>
+      </header>
+
+      <table class="buglist">
+        <tr>
+          <td>Bug 1210770</td>
+          <td>"addon might slow down browser" is inaccurate and annoying</td>
+        </tr>
+        <tr>
+          <td>Bug 1191342</td>
+          <td>Slow add-on warning, even if my add-ons do nothing</td>
+        </tr>
+        <tr>
+          <td>Bug 1188507</td>
+          <td>Nightly should not warn about Lightbeam making it run slowly</td>
+        </tr>
+        <tr>
+          <td>Bug 1152950</td>
+          <td>AddonWatcher should not inform the user at the first infraction</td>
+        </tr>
+        <tr>
+          <td>Bug 1200169</td>
+          <td>We should make the AddonWatcher more tolerant</td>
+        </tr>
+        <tr>
+          <td>Bug 1200172</td>
+          <td>Don't report slow add-ons if the system is hibernating</td>
+        </tr>
+        <tr>
+          <td>Bug 1219144</td>
+          <td>Only raise jank notifications if there is user-visible jank</td>
+        </tr>
+        <tr style="text-align:center">
+          <td>...</td>
+          <td>...</td>
+        </tr>
+      </table>
+    </section>
+  </div></div>
+
+  <div id="section:result:jank" class="slide"><div>
+    <section>
+      <header>
+        <h2>It is slow but is it jank?</h2>
+      </header>
+      Not if:
+      <ul>
+        <li>Am I in front of the screen?</li>
+        <li>Is something happening on-screen?</li>
+        <li>Am I expecting something to happen on-screen?</li>
+        <li>...in this process?</li>
+      </ul>
+  </section>
+  </div></div>
+
+  <div id="section:result:outro" class="slide"><div>
+    <section>
+      <header>
+        <h2>The story so far</h2>
+      </header>
+      <ol>
+        <li>What is running? <span class="tick"></span></li>
+        <li>How slow is it? <span class="tick"></span><span class="tick"></span></li>
+        <li>Report it!</li>
+      </ol>
+    </section>
+  </div></div>
+
+  <div id="section:data" class="slide oneline"><div>
+    <section>
+      <header>
+        <h2>So, let's report it!</h2>
+      </header>
+    </section>
+  </div></div>
+
+  <div id="section:next:telemetry" class="slide"><div>
+    <section>
+      <header>
+        <h2>Telemetry</h2>
+      </header>
+      <img src="pictures/Telemetry.png" style="width:90%;text-align:center"/>
+      <footer class="notes">
+        Telemetry data can be used by add-on developers to find out if their add-ons are slow.
+        It can also help Firefox developers find out if there is a problem with an API.
+        Finally, it can help addons.mozilla.org determine if it's a good idea to install
+        an add-on.
+      </footer>
+  </section>
+  </div></div>
+
+  <div id="section:next:self-support" class="slide"><div>
+    <section>
+      <header>
+        <h2>Self-support</h2>
+      </header>
+      <ul>
+        <li><span class="strikethrough">Ugly yellow bar of death</span></li>
+        <li>about:performance</li>
+      </ul>
+      // FIXME: Detect issues on user's computers
+      // FIXME: Get rid of that )*&^)& Yellow Bar
+  </section>
+  </div></div>
+
+  <div id="thanks" class="slide"><div>
+    <section>
+      <header>
+        <h2>Thanks</h2>
+      </header>
+      <img src="pictures/mozillaoverview/redpanda.jpg" class="right" alt="Red panda (Firefox)">
+      <ul class="nobull">
+        <li>{name}</li>
+        <li>{title}</li>
+        <li>{<a href="http://twitter.com/">@twitter</a>}</li>
+        <li><strong>Slides</strong>: {slideurl}</li>
+      </ul>
+      <small class="credits">
+        <a href="http://www.flickr.com/photos/yortw/5798336827/">Photo by Yortw</a>
+      </small>
+
+    <footer class="notes">
+    </footer>
+
+    </section>
+  </div></div>
+
+  <!--
+    To hide progress bar from entire presentation
+    just remove “progress” element.
+    -->
+  <div class="progress"><div></div></div>
+
+  <script src="scripts/script.js"></script>
+  <!-- Copyright © 2010–2012 Vadim Makeev — pepelsbey.net -->
+</body>
+</html>
