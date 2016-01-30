@@ -795,8 +795,9 @@ span.strikethrough {
   text-decoration: line-through;
 }
 
-td.fixed {
+table.buglist td.fixed {
   text-decoration: line-through;
+  background-color: gray;
 }
 
 table.stack {
