@@ -458,7 +458,7 @@
   <div id="section:how:clock" class="slide"><div>
     <section>
       <header>
-        <h2>Measuring with a clock</h2>
+        <h2>Measuring durations</h2>
       </header>
 
       <table class="stack">
@@ -599,8 +599,8 @@
       Cons
       </h2>
       <ul>
-        <li>Clocks are slow.</li>
-        <li>Clocks... stop and jump and time travel?</li>
+        <li>OS Clocks are slow.</li>
+        <li>OS Clocks... stop and jump and time travel?</li>
       </ul>
     </section>
   </div></div>
@@ -653,12 +653,21 @@
         <h2>Measuring with RDTSC</h2>
       </header>
 
-      ReaD Time Stamp Clock: return the number of clock cycles elapsed on <span class="emph">this</span> core
+      <span style="font-weight:bold">ReaD Time Stamp Clock</span>: return the number of clock cycles elapsed on <span class="emph">this</span> core
       since the last reset.
 
-      <br />
-
-      Fun fact: It's not monotonic. At all.
+      <h2 class="discussion">
+      Pros
+      </h2>
+      <ul>
+      <li>It's very, very fast.</li>
+      </ul>
+      <h2 class="discussion">
+      Cons
+      </h2>
+      <ul>
+        <li>It's not synchronized between CPUs.</li>
+      </ul>
     </section>
   </div></div>
 

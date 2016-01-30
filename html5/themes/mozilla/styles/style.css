@@ -806,7 +806,8 @@ table.stack {
 
 table.stack td {
   padding-right: .5em;
-  border-bottom: black 1pt solid;
+  padding-left: .5em;
+  border-bottom: lightgray 5pt outset;
   background-color: white;
 }
 
