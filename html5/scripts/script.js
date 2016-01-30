@@ -221,7 +221,8 @@
 
   function lognotes(slideNumber) {
     if (window.console && slideList[slideNumber]) {
-      var notes = document.querySelector('#' + slideList[slideNumber].id + ' .notes');
+      var selector = '#' + slideList[slideNumber].id + ' .notes';
+      var notes = document.querySelector(selector);
       if (notes) {
         console.info(notes.innerHTML.replace(/\n\s+/g, '\n'));
       }
@@ -400,7 +401,8 @@ function goFullScreen() {
   }
 }
 
-var lang = 'en-US';
+const DEFAULT_LANG = 'en-US';
+var lang = DEFAULT_LANG;
 try {
   lang = new URL(window.location).searchParams.get('lang');
 } catch (ex) {
@@ -408,11 +410,13 @@ try {
 }
 
 // Pre-selects the correct current language on the dropdown menu
-document.getElementById('langMenuId').value = lang;
+if (document.getElementById('langMenuId')) {
+  document.getElementById('langMenuId').value = lang || DEFAULT_LANG;
+}
 
 function changeLanguage() {
   var langObj = document.getElementById('langMenuId');
-  document.documentElement.lang = langObj.value;
+  document.documentElement.lang = langObj.value || DEFAULT_LANG;
 
   // Update the language code in the URL bar
   try {
@@ -424,4 +428,8 @@ function changeLanguage() {
   }
 }
 
-changeLanguage();
+try {
+  changeLanguage();
+} catch (ex) {
+  // Ignore.
+}
